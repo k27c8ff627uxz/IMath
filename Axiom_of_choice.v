@@ -4,7 +4,7 @@ Require Import Relation.
 Require Import BaseMap.
 Require Import Maps.
 
-Definition RAC {A B : Type} := 
+Definition RAC := forall (A B : Type), 
   forall (P : A -> B -> Prop),
     (forall a, exists b, P a b) ->
     (exists f : A -> B, forall a, P a (f a)).
@@ -13,6 +13,17 @@ Definition AC := forall A B,
   forall R : #(Relation A B),
     (forall a, exists b, &&R a b) ->
     (exists f, forall a, &&R a (%f a)).
+
+Theorem RAC_AC : RAC -> AC.
+Proof.
+intro rac.
+intros A B R cond.
+apply (rac (#A) (#B) (fun a b => &&R a b)) in cond.
+destruct cond as [f cond].
+Check MakeMap.
+exists (MakeMap f).
+
+apply cond.
 
   
 

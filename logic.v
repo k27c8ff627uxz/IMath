@@ -236,6 +236,33 @@ rewrite EqP.
 tauto.
 Qed.
 
+Theorem ProofEquiv_RFun : ProofEquiv -> forall A B (F : (#A) -> (#B)), RFun F.
+Proof.
+intros pe A B F.
+intros x y Eqxy.
+destruct x as [x InxA].
+destruct y as [y InyA].
+unfold ZFCEq in Eqxy.
+assert(Eqxy' : {x ! InxA} == {y ! InyA}).
+now apply Eqxy.
+clear Eqxy.
+assert(Eqxy : x = y).
+{
+  unfold ZFCEq in Eqxy'.
+  apply Eqxy'.
+}
+apply (TransitivityEq (F {x ! InxA})).
+now auto.
+apply (TransitivityEq (F {y ! InyA})).
+{
+  subst.
+  assert(Eqp : InyA = InxA).
+  now apply pe.
+  rewrite Eqp.
+  auto.
+}
+now auto.
+Qed.
 
 (* Unique *)
 Definition Unique (P : SET -> Prop) :=

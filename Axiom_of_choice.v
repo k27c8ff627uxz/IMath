@@ -14,17 +14,22 @@ Definition AC := forall A B,
     (forall a, exists b, &&R a b) ->
     (exists f, forall a, &&R a (%f a)).
 
-Theorem RAC_AC : RAC -> AC.
+Theorem RAC_AC : ProofEquiv -> RAC -> AC.
 Proof.
-intro rac.
+intros pe rac.
 intros A B R cond.
 apply (rac (#A) (#B) (fun a b => &&R a b)) in cond.
 destruct cond as [f cond].
-Check MakeMap.
-exists (MakeMap f).
-
-apply cond.
-
+assert(RF : RFun f).
+now apply ProofEquiv_RFun.
+set (MakeMap _ _ f RF) as F.
+exists F.
+intro a.
+generalize (cond a).
+apply RelRewriteR.
+apply SymmetryEq.
+apply MakeMapTheorem.
+Qed.
   
 
 Theorem AC_PEM : AC -> REM.

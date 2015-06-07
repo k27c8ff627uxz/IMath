@@ -1607,9 +1607,47 @@ apply H1.
 apply H2.
 Qed.
 
+Definition Rel_ASymCond {A} (rel : #(BRelation A)) :=
+forall x y, &&rel x y -> &&rel y x -> x == y.
 
-
-
+Theorem Rel_ASym : forall {A} (rel : #(BRelation A)),
+Rel_ASymCond rel <-> In rel (Antisymmetric A).
+Proof.
+  intros A rel.
+  split.
+  {
+    intro cond.
+    apply SSet'Theorem.
+    split.
+    apply SetProp.
+    intros prf x y Relxy Relyx.
+    apply cond.
+    {
+      generalize Relxy.
+      apply RelRewrite.
+      reflexivity.
+    } {
+      generalize Relyx.
+      apply RelRewrite.
+      reflexivity.
+    }
+  } {
+    intro relA.
+    intros x y relHxy relHyx.
+    apply SSet'Theorem in relA.
+    destruct relA as [prf HH].
+    apply (HH prf).
+    {
+      generalize relHxy.
+      apply RelRewrite.
+      reflexivity.
+    } {
+      generalize relHyx.
+      apply RelRewrite.
+      reflexivity.
+    }
+  }
+Qed.
 
 
 (** Irsymmetric **)
@@ -1802,37 +1840,130 @@ Qed.
 
 
 
+(** PreOrderRelation **)
+Definition Poset A := Section (Reflexive A) (Transitive A).
 
+Theorem Poset_Ref : forall {A}, Subset (Poset A) (Reflexive A).
+Proof.
+  intro A.
+  apply SectionSubsetL.
+Qed.
 
+Theorem Poset_Trans : forall {A}, Subset (Poset A) (Transitive A).
+Proof.
+  intro A.
+  apply SectionSubsetR.
+Qed.  
+  
+Theorem Poset_Rel : forall {A}, Subset (Poset A) (BRelation A).
+Proof.
+  intro A.
+  generalize (@Ref_Rel A).
+  apply TransitivitySubset.
+  apply Poset_Ref.
+Qed.
+
+Definition Rel_PosetCond {A} (rel : #(BRelation A)) := Rel_RefCond rel /\ Rel_TransCond rel.
+
+Theorem Rel_Poset : forall {A} (rel : #(BRelation A)),
+Rel_PosetCond rel <-> In rel (Poset A).
+Proof.
+  intros A rel.
+  split.
+  {
+    intro relH.
+    destruct relH as [refH tranH].
+    apply SectionTheorem.
+    split.
+    {
+      apply Rel_Ref.
+      apply refH.
+    } {
+      apply Rel_Trans.
+      apply tranH.
+    }
+  } {
+    intro InreP.
+    apply SectionTheorem in InreP.
+    destruct InreP as [InreR InreT].
+    split.
+    {
+      apply Rel_Ref.
+      apply InreR.
+    } {
+      apply Rel_Trans.
+      apply InreT.
+    }
+  }
+Qed.
+  
 (** PartialOrderRelation **)
 Definition ORelation A :=
-Section (Section (Reflexive A) (Antisymmetric A))  (Transitive A).
+  Section (Poset A) (Antisymmetric A).
+
+Theorem ORel_Poset : forall {A}, Subset (ORelation A) (Poset A).
+Proof.
+  intro A.
+  apply SectionSubsetL.
+Qed.
 
 Theorem ORel_Ref : forall {A} , Subset (ORelation A) (Reflexive A).
 Proof.
-intros A.
-apply (TransitivitySubset (Section (Reflexive A) (Antisymmetric A))).
-apply SectionSubsetL.
-apply SectionSubsetL.
+  intros A.
+  generalize (@Poset_Ref A).
+  apply TransitivitySubset.
+  apply ORel_Poset.
 Qed.
 
 Theorem ORel_ASym : forall {A} , Subset (ORelation A) (Antisymmetric A).
 Proof.
 intros A.
-apply (TransitivitySubset (Section (Reflexive A) (Antisymmetric A))).
-apply SectionSubsetL.
 apply SectionSubsetR.
 Qed.
 
 Theorem ORel_Rel : forall {A} , Subset (ORelation A) (BRelation A).
 Proof.
-intro A.
-apply (TransitivitySubset (Reflexive A)).
-apply ORel_Ref.
-apply Ref_Rel.
+  intro A.
+  generalize (@ASym_Rel A).
+  apply TransitivitySubset.
+  apply ORel_ASym.
+Qed.  
+
+Definition Rel_ORelCond {A} (rel : #(BRelation A)) :=
+  Rel_PosetCond rel /\ Rel_ASymCond rel.
+
+
+Theorem Rel_ORel : forall {A} (rel : #(BRelation A)),
+Rel_ORelCond rel <-> In rel (ORelation A).
+Proof.
+  intros A rel.
+  split.
+  {
+    intro relH.
+    destruct relH as [poH asymH].
+    apply SectionTheorem.
+    split.
+    {
+      apply Rel_Poset.
+      apply poH.
+    } {
+      apply Rel_ASym.
+      apply asymH.
+    }
+  } {
+    intro InreP.
+    apply SectionTheorem in InreP.
+    destruct InreP as [InreR InreA].
+    split.
+    {
+      apply Rel_Poset.
+      apply InreR.
+    } {
+      apply Rel_ASym.
+      apply InreA.
+    }
+  }
 Qed.
-
-
 
 
 

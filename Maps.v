@@ -10,9 +10,11 @@ Proof.
 intros A B.
 apply RistableMapTheorem.
 split.
-apply RUnq_Rel.
-split.
-apply ReflexivitySubset.
+{
+  split.
+  apply RUnq_Rel.
+  apply ReflexivitySubset.
+}
 intros rel InrR.
 apply (SetProp).
 Qed.
@@ -23,9 +25,11 @@ Proof.
 intros A B.
 apply RistableMapTheorem.
 split.
-apply LTtl_Rel.
-split.
-apply ReflexivitySubset.
+{
+  split.
+  apply LTtl_Rel.
+  apply ReflexivitySubset.
+}
 intros rel InreL.
 apply (SetProp).
 Qed.
@@ -36,9 +40,11 @@ Proof.
 intros A B.
 apply RistableMapTheorem.
 split.
-apply Map_Rel.
-split.
-apply ReflexivitySubset.
+{
+  split.
+  apply Map_Rel.
+  apply ReflexivitySubset.
+}
 intros rel InreM.
 apply (SetProp).
 Qed.
@@ -98,23 +104,29 @@ Proof.
 intros A X Y.
 apply RistableMapTheorem.
 split.
-apply SubsetInCartesian.
-apply LTtl_Rel.
-apply LTtl_Rel.
-split.
-apply LTtl_Rel.
-intros relD InrelC.
-apply Rel_LTtl.
-intro a.
+{
+  split.
+  apply SubsetInCartesian.
+  apply LTtl_Rel.
+  apply LTtl_Rel.
+  apply LTtl_Rel.
+}
+intros cc InrelC.
 put (CartesianIsPair' _ _ _ InrelC) IsrelD.
 destruct IsrelD as [rel1 IsrelD].
 destruct IsrelD as [rel2 IsrelD].
 assert(rel1C : Rel_LTtlCond (rel1{<LTtl_Rel})).
+{
  apply Rel_LTtl.
  apply (SetProp rel1).
+}
 assert(rel2C : Rel_LTtlCond (rel2{<LTtl_Rel})).
- apply Rel_LTtl.
- apply (SetProp rel2).
+{
+  apply Rel_LTtl.
+  apply (SetProp rel2).
+}
+apply Rel_LTtl.
+intro a.
 destruct (rel1C a) as [b rel1C'].
 destruct (rel2C a) as [c rel2C'].
 exists [b;c].
@@ -133,11 +145,13 @@ Proof.
 intros A X Y.
 apply RistableMapTheorem.
 split.
-apply SubsetInCartesian.
-apply RUnq_Rel.
-apply RUnq_Rel.
-split.
-apply RUnq_Rel.
+{
+  split.
+  apply SubsetInCartesian.
+  apply RUnq_Rel.
+  apply RUnq_Rel.
+  apply RUnq_Rel.
+}
 intros relD InrelC.
 apply Rel_RUnq.
 intro a.
@@ -197,19 +211,20 @@ Proof.
 intros A X Y.
 apply RistableMapTheorem.
 split.
-apply SubsetInCartesian.
-apply Map_Rel.
-apply Map_Rel.
-split.
-apply Map_Rel.
+{
+  split.
+  apply SubsetInCartesian.
+  apply Map_Rel.
+  apply Map_Rel.
+  apply Map_Rel.
+}
 intros p InpC.
 apply Rel_Map2.
 split.
  apply Rel_LTtl.
  put (CartesianRelationRRistableLTtl A X Y) LTR.
  apply RistableMapTheorem in LTR.
- destruct LTR as [S1 LTR].
- destruct LTR as [S2 LTR].
+ destruct LTR as [[S1 S2] LTR].
  apply LTR.
  assert(sub : Subset (Cartesian (Map A X) (Map A Y)) (Cartesian (LeftTotal A X) (LeftTotal A Y))).
   apply SubsetInCartesian; apply Map_LTtl.
@@ -219,8 +234,7 @@ split.
  apply Rel_RUnq.
  put (CartesianRelationRRistableRUnq A X Y) RUR.
  apply RistableMapTheorem in RUR.
- destruct RUR as [S1 RUR].
- destruct RUR as [S2 RUR].
+ destruct RUR as [[S1 S2] RUR].
  apply RUR.
  assert(sub : Subset (Cartesian (Map A X) (Map A Y)) (Cartesian (RightUnique A X) (RightUnique A Y))).
   apply SubsetInCartesian; apply Map_RUnq.
@@ -259,9 +273,11 @@ Proof.
 intros A X Y.
 apply RistableMapTheorem.
 split.
-apply SubsetInCartesian; apply Inj_Map.
-split.
-apply Inj_Map.
+{
+  split.
+  apply SubsetInCartesian; apply Inj_Map.
+  apply Inj_Map.
+}
 intros fD InfDC.
 put (CartesianIsPair' _ _ _ InfDC) fD'.
 destruct fD' as [f1 fD'].
@@ -388,9 +404,11 @@ Proof.
 intros A B.
 apply RistableMapTheorem.
 split.
-apply RUnq_Rel.
-split.
-apply LUnq_Rel.
+{
+  split.  
+  apply RUnq_Rel.
+  apply LUnq_Rel.
+}
 intros rel InrelR.
 apply Rel_RUnq in InrelR.
 apply Rel_LUnq.
@@ -408,9 +426,11 @@ Proof.
 intros A B.
 apply RistableMapTheorem.
 split.
-apply LUnq_Rel.
-split.
-apply RUnq_Rel.
+{
+  split.
+  apply LUnq_Rel.
+  apply RUnq_Rel.
+}
 intros rel InrelR.
 apply Rel_LUnq in InrelR.
 apply Rel_RUnq.
@@ -428,9 +448,11 @@ Proof.
 intros A B.
 apply RistableMapTheorem.
 split.
-apply LTtl_Rel.
-split.
-apply RTtl_Rel.
+{
+  split.
+  apply LTtl_Rel.
+  apply RTtl_Rel.
+}
 intros rel InrelL.
 apply Rel_LTtl in InrelL.
 apply Rel_RTtl.
@@ -447,9 +469,11 @@ Proof.
 intros A B.
 apply RistableMapTheorem.
 split.
-apply RTtl_Rel.
-split.
-apply LTtl_Rel.
+{
+  split.
+  apply RTtl_Rel.
+  apply LTtl_Rel.
+}
 intros rel InrelL.
 apply Rel_RTtl in InrelL.
 apply Rel_LTtl.
@@ -460,8 +484,59 @@ apply InverseRelTheorem'.
 assumption.
 Qed.
 
+Theorem InverseRel_RistMapRef : forall A,
+  In (@InverseRel A A) (RistableMap (BRelation A) (BRelation A) (Reflexive A) (Reflexive A)).
+Proof.
+  intro A.
+  apply RistableMapTheorem.
+  split.
+  {
+    split.    
+    apply Ref_Rel.
+    apply Ref_Rel.
+  }
+  intros rel InrelR.  
+  apply Rel_Ref in InrelR.
+  apply Rel_Ref.
+  intros a.
+  apply -> (InverseRelTheorem rel).
+  apply InrelR.
+Qed.
 
+Theorem InverseRel_RistMapSym : forall A,
+  In (@InverseRel A A) (RistableMap (BRelation A) (BRelation A) (Symmetric A) (Symmetric A)).
+Proof.
+  intro A.
+  apply RistableMapTheorem.
+  split.
+  {
+    split.
+    apply Sym_Rel.
+    apply Sym_Rel.
+  }
+  intros rel InrelS.
+  apply Rel_Sym in InrelS.
+  apply Rel_Sym.
+  intros a b relab.
+  apply -> (InverseRelTheorem rel).
+  apply InrelS.
+  generalize relab.
+  apply (InverseRelTheorem rel).
+Qed.
 
+(*
+Theorem InverseRel_RistMapASym : forall A,
+  In (@InverseRel A A) (RistableMap (BRelation A) (BRelation A) (Antisymmetric A) (Antisymmetric A)).
+Proof.
+  intro A.
+  apply RistableMapTheorem.
+  split.5A
+  
+  split; try (exact (@Ref_Ref A)).
+  forall {A} (rel : #(BRelation A)),
+    In (
+w-inds
+*)
 (* Combine *)
 Theorem CombineRelationRistableMap : forall A B C,
 In (@CombineRelation A B C) (RistableMap (Cartesian (Relation A B) (Relation B C)) (Relation A C) (Cartesian (Map A B) (Map B C)) (Map A C)).
@@ -469,9 +544,13 @@ Proof.
 intros A B C.
 apply RistableMapTheorem.
 split.
-apply SubsetInCartesian; apply Map_Rel.
-split.
-apply Map_Rel.
+{
+  split.
+  apply SubsetInCartesian.
+  apply Map_Rel.
+  apply Map_Rel.
+  apply Map_Rel.
+}
 intros relD InrelDC.
 put (CartesianIsPair' _ _ _ InrelDC) IsPrelD.
 destruct IsPrelD as [rel1 IsPrelD].
@@ -593,11 +672,13 @@ Proof.
 intros A B.
 apply RistableMapTheorem.
 split.
-apply (TransitivitySubset (Map A B)).
-apply Bij_Map.
-apply Map_Rel.
-split.
-apply Map_Rel.
+{
+  split.
+  apply (TransitivitySubset (Map A B)).
+  apply Bij_Map.
+  apply Map_Rel.
+  apply Map_Rel.
+}
 intros rel InrelB.
 assert(InrelM : In rel (Map A B)).
  apply Bij_Map.
@@ -1290,9 +1371,11 @@ Proof.
 intros A B S f sub.
 apply RistableMapTheorem.
 split.
-assumption.
-split.
-apply ReflexivitySubset.
+{
+  split.
+  assumption.
+  apply ReflexivitySubset.
+}
 intros a InaS.
 apply MapIn. 
 Qed.
@@ -1303,9 +1386,11 @@ Proof.
 intros A B S sub.
 apply RistableMapTheorem.
 split.
-apply RUnq_Rel.
-split.
-apply RUnq_Rel.
+{
+  split.
+  apply RUnq_Rel.
+  apply RUnq_Rel.
+}
 intros rel InrelRU.
 apply Rel_RUnq.
 intros s b1 b2 HH1 HH2.
@@ -1330,9 +1415,11 @@ Proof.
 intros A B S sub.
 apply RistableMapTheorem.
 split.
-apply LTtl_Rel.
-split.
-apply LTtl_Rel.
+{
+  split.
+  apply LTtl_Rel.
+  apply LTtl_Rel.
+}
 intros rel InrelLT.
 apply Rel_LTtl.
 intros s.
@@ -1352,17 +1439,18 @@ Proof.
 intros A B S sub.
 apply RistableMapTheorem.
 split.
-apply Map_Rel.
-split.
-apply Map_Rel.
+{
+  split.
+  apply Map_Rel.
+  apply Map_Rel.
+}
 intros rel InrelM.
 apply Rel_Map2.
 split.
  apply Rel_LTtl.
  put (@RistrictRistableMapLTl A B S sub) LC.
  apply RistableMapTheorem in LC.
- destruct LC as [T1 LC].
- destruct LC as [T2 LC].
+ destruct LC as [[T1 T2] LC].
  apply LC.
  apply Map_LTtl.
  apply InrelM.
@@ -1370,8 +1458,7 @@ split.
  apply Rel_RUnq.
  put (@RistrictRistableMapRUnq A B S sub) RC.
  apply RistableMapTheorem in RC.
- destruct RC as [T1 RC].
- destruct RC as [T2 RC].
+ destruct RC as [[T1 T2] RC].
  apply RC.
  apply Map_RUnq.
  apply InrelM.
@@ -1426,8 +1513,7 @@ split.
 intro InfR.
 unfold RistableRMap in InfR.
 apply RistableMapTheorem in InfR.
-destruct InfR as [SubA InfR].
-destruct InfR as [SubB InfR].
+destruct InfR as [[SubA SubB] InfR].
 split.
 assumption.
 intro a.
@@ -1439,9 +1525,11 @@ destruct Cond as [SubB Cond].
 unfold RistableRMap.
 apply RistableMapTheorem.
 split.
-apply ReflexivitySubset.
-split.
-assumption.
+{
+  split.
+  apply ReflexivitySubset.
+  assumption.
+}
 intros a InaA.
 apply Cond.
 Qed.
@@ -1537,9 +1625,11 @@ Proof.
 intros A B X sub.
 apply RistableMapTheorem.
 split.
-apply RUnq_Rel.
-split.
-apply RUnq_Rel.
+{
+  split.
+  apply RUnq_Rel.
+  apply RUnq_Rel.
+}
 intros rel InrelR.
 apply Rel_RUnq.
 intro a.
@@ -1574,9 +1664,11 @@ Proof.
 intros A B X sub.
 apply RistableMapTheorem.
 split.
-apply LTtl_Rel.
-split.
-apply LTtl_Rel.
+{
+  split.
+  apply LTtl_Rel.
+  apply LTtl_Rel.
+}
 intros rel InrelL.
 apply Rel_LTtl in InrelL.
 apply Rel_LTtl.
@@ -1597,17 +1689,18 @@ Proof.
 intros A B X sub.
 apply RistableMapTheorem.
 split.
-apply Map_Rel.
-split.
-apply Map_Rel.
+{
+  split.
+  apply Map_Rel.
+  apply Map_Rel.
+}
 intros rel InrelM.
 apply Rel_Map2.
 split.
  apply Rel_LTtl.
  put (ExpandRRistableLTtl A B X sub) EL.
  apply RistableMapTheorem in EL.
- destruct EL as [EL1 EL2].
- destruct EL2 as [EL2 EL3].
+ destruct EL as [[EL1 EL2] EL3].
  apply EL3.
  apply Map_LTtl.
  assumption.
@@ -1615,8 +1708,7 @@ split.
  apply Rel_RUnq.
  put (ExpandRRistableRUnq A B X sub) ER.
  apply RistableMapTheorem in ER.
- destruct ER as [ER1 ER2].
- destruct ER2 as [ER2 ER3].
+ destruct ER as [[ER1 ER2] ER3].
  apply ER3.
  apply Map_RUnq.
  assumption.
@@ -3323,9 +3415,11 @@ assert(SubB : Subset (Classifications B) (PowerSet (PowerSet B))).
  apply ClassificationPPSubset.
 apply RistableMapTheorem.
 split.
- apply SubsetInCartesian; assumption.
-split.
- apply ClassificationPPSubset.
+{
+  split.
+  apply SubsetInCartesian; assumption.
+  apply ClassificationPPSubset.
+}
 intros SSAB InSSAB.
 put (CartesianIsPair' _ _ _ InSSAB) EqSSAB.
 destruct EqSSAB as [CA EqSSAB].
@@ -3501,48 +3595,54 @@ assert(SubPB : Subset (Classifications B) (PowerSet (PowerSet B))).
  apply ClassificationPPSubset.
 apply RistableMapTheorem.
 split.
- apply SubsetInCartesian; assumption.
-split.
- intros SASB InSASB.
- unfold DoubleClassifications in InSASB.
- assert (InSASB' : In SASB (%(%BinaryMapImage MCartesian) [CA{<SubPA} ; CB{<SubPB}])).
-  generalize InSASB.
-  apply ArrowRewrite.
-  apply MapStrong.
-   apply StrongRistMapEq.
-   hyperreflexivity.
-  hyperreflexivity.
- clear InSASB.
- rename InSASB' into InSASB.
- apply BinaryMapImageTheorem in InSASB.
- destruct InSASB as [SA InSASB].
- destruct InSASB as [SB InSASB].
- destruct InSASB as [InSA InSASB].
- destruct InSASB as [InSB EqSASB].
- rewrite (MCartesianEq _ _) in EqSASB.
- rewrite <- EqSASB.
- apply PowersetTheorem.
- intros p InpC.
- put (CartesianIsPair' _ _ _ InpC) IsPp.
- destruct IsPp as [a IsPp].
- destruct IsPp as [b Eqp].
- rewrite Eqp.
- apply CartesianTheorem'.
- split.
-  assert(InSAA : In SA (PowerSet A)).
-   apply SubA.
-   apply InSA.
-  apply PowersetTheorem in InSAA.
-  apply InSAA.
-  apply SetProp.
-
+{
+  split.
+  apply SubsetInCartesian; assumption.
+  intros SASB InSASB.
+  unfold DoubleClassifications in InSASB.
+  assert (InSASB' : In SASB (%(%BinaryMapImage MCartesian) [CA{<SubPA} ; CB{<SubPB}])).
+  {
+    generalize InSASB.
+    apply ArrowRewrite.
+    apply MapStrong.
+    apply StrongRistMapEq.
+    hyperreflexivity.
+    hyperreflexivity.
+  }
+  clear InSASB.
+  rename InSASB' into InSASB.
+  apply BinaryMapImageTheorem in InSASB.
+  destruct InSASB as [SA InSASB].
+  destruct InSASB as [SB InSASB].
+  destruct InSASB as [InSA InSASB].
+  destruct InSASB as [InSB EqSASB].
+  rewrite (MCartesianEq _ _) in EqSASB.
+  rewrite <- EqSASB.
+  apply PowersetTheorem.
+  intros p InpC.
+  put (CartesianIsPair' _ _ _ InpC) IsPp.
+  destruct IsPp as [a IsPp].
+  destruct IsPp as [b Eqp].
+  rewrite Eqp.
+  apply CartesianTheorem'.
+  split.
+  {
+    assert(InSAA : In SA (PowerSet A)).
+    apply SubA.
+    apply InSA.
+    apply PowersetTheorem in InSAA.
+    apply InSAA.
+    apply SetProp.
+  }
   assert(InSBB : In SB (PowerSet B)).
-   apply SubB.
-   apply InSB.
+  {
+    apply SubB.
+    apply InSB.
+  }
   apply PowersetTheorem in InSBB.
   apply InSBB.
   apply SetProp.
-
+}
 intros SASB InSASB.
 put (CartesianIsPair' _ _ _ InSASB) IsPSASB.
 destruct IsPSASB as [SA IsPSASB].
@@ -3989,9 +4089,11 @@ Proof.
 intros A B CA CB.
 apply RistableMapTheorem.
 split.
- apply CDMap_Map.
-split.
- apply Map_Rel.
+{
+  split. 
+  apply CDMap_Map.
+  apply Map_Rel.
+}
 intros f InfC.
 rewrite (CombineMap'Theorem _ _ _ _ _ _).
 rewrite (CombineMap'Theorem _ _ _ _ _ _).

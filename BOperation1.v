@@ -571,9 +571,11 @@ assert(subSA : Subset S A).
 rewrite (USETEq' _ BOpe_Map).
 apply RistableMapTheorem.
 split.
- apply SubsetInCartesian; apply subSA.
-split.
- apply subSA.
+{
+  split.
+  apply SubsetInCartesian; apply subSA.
+  apply subSA.
+}
 intros aa InaaC.
 cut (In (%o aa) S).
  apply Arrow2Rewrite.
@@ -1649,10 +1651,12 @@ Proof.
 intros A.
 apply RistableMapTheorem.
 split.
+{
+  split.
  apply Invert_Ope.
-split.
  unfold BRelation.
  apply LTtl_Rel.
+}
 intros o InaI.
 apply SSet'Theorem in InaI.
 destruct InaI as [InoB cond].
@@ -2811,11 +2815,13 @@ Proof.
 intros A.
 apply RistableMapTheorem.
 split.
- apply SGrp_Ope.
-split.
- apply (TransitivitySubset (Relation A A)).
- apply RUnq_Rel.
- apply Rel_BRel.
+{
+  split.
+  apply SGrp_Ope.
+  apply (TransitivitySubset (Relation A A)).
+  apply RUnq_Rel.
+  apply Rel_BRel.
+}
 intros o InoS.
 rewrite (USETEq' _ BRel_Rel).
 apply Rel_RUnq.
@@ -2857,8 +2863,7 @@ intros A sg.
 apply Rel_RUnq.
 put (@IsInverseE_of_SGrpInRUnq A) RU.
 apply RistableMapTheorem in RU.
-destruct RU as [sub1 RU].
-destruct RU as [sub2 RU].
+destruct RU as [[sub1 sub2] RU].
 apply RU.
 apply (SetProp sg).
 Qed.
@@ -3998,10 +4003,12 @@ Proof.
 intros A.
 apply RistableMapTheorem.
 split.
- apply Grp_Ope.
-split.
- unfold BRelation.
- apply Map_Rel.
+{
+  split.
+  apply Grp_Ope.
+  unfold BRelation.
+  apply Map_Rel.
+}
 intros o InaG.
 rewrite (USETEq' _ BRel_Rel).
 apply Rel_Map2.

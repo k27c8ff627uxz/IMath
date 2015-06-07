@@ -1690,7 +1690,7 @@ SSet' (Map A B) (fun f => Subset SA A /\ Subset SB B /\ forall (a : #A), In a SA
 
 Theorem RistableMapTheorem : forall {A B} SA SB (f : #(Map A B)),
 In f (RistableMap A B SA SB) <-> 
-Subset SA A /\ Subset SB B /\ forall (a : #A), In a SA -> In (%f a) SB.
+(Subset SA A /\ Subset SB B) /\ forall (a : #A), In a SA -> In (%f a) SB.
 Proof.
 intros A B SA SB f.
 split.
@@ -1700,9 +1700,7 @@ split.
  destruct (HH InfM) as [SubA HH'].
  destruct HH' as [SubB HH'].
  split.
- assumption.
- split.
- assumption.
+ split; assumption.
  intros a InaSA.
  cut (In (%{f ! InfM} a) SB).
   apply Arrow2Rewrite.
@@ -1713,8 +1711,7 @@ split.
  assumption.
 
  intro DD.
- destruct DD as [SubA DD].
- destruct DD as [SubB DD].
+ destruct DD as [[SubA SubB] DD].
  apply SSet'Theorem.
  split.
  apply SetProp.
@@ -1766,8 +1763,7 @@ forall (a : #A), In a SA -> In (%f a) SB.
 Proof.
 intros A B SA SB f InfR a InsA.
 apply RistableMapTheorem in InfR.
-destruct InfR as [SubA InfR].
-destruct InfR as [SubB InfR].
+destruct InfR as [[SubA SubB] InfR].
 apply InfR.
 assumption.
 Qed.

@@ -484,59 +484,7 @@ apply InverseRelTheorem'.
 assumption.
 Qed.
 
-Theorem InverseRel_RistMapRef : forall A,
-  In (@InverseRel A A) (RistableMap (BRelation A) (BRelation A) (Reflexive A) (Reflexive A)).
-Proof.
-  intro A.
-  apply RistableMapTheorem.
-  split.
-  {
-    split.    
-    apply Ref_Rel.
-    apply Ref_Rel.
-  }
-  intros rel InrelR.  
-  apply Rel_Ref in InrelR.
-  apply Rel_Ref.
-  intros a.
-  apply -> (InverseRelTheorem rel).
-  apply InrelR.
-Qed.
 
-Theorem InverseRel_RistMapSym : forall A,
-  In (@InverseRel A A) (RistableMap (BRelation A) (BRelation A) (Symmetric A) (Symmetric A)).
-Proof.
-  intro A.
-  apply RistableMapTheorem.
-  split.
-  {
-    split.
-    apply Sym_Rel.
-    apply Sym_Rel.
-  }
-  intros rel InrelS.
-  apply Rel_Sym in InrelS.
-  apply Rel_Sym.
-  intros a b relab.
-  apply -> (InverseRelTheorem rel).
-  apply InrelS.
-  generalize relab.
-  apply (InverseRelTheorem rel).
-Qed.
-
-(*
-Theorem InverseRel_RistMapASym : forall A,
-  In (@InverseRel A A) (RistableMap (BRelation A) (BRelation A) (Antisymmetric A) (Antisymmetric A)).
-Proof.
-  intro A.
-  apply RistableMapTheorem.
-  split.5A
-  
-  split; try (exact (@Ref_Ref A)).
-  forall {A} (rel : #(BRelation A)),
-    In (
-w-inds
-*)
 (* Combine *)
 Theorem CombineRelationRistableMap : forall A B C,
 In (@CombineRelation A B C) (RistableMap (Cartesian (Relation A B) (Relation B C)) (Relation A C) (Cartesian (Map A B) (Map B C)) (Map A C)).

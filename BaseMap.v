@@ -1978,23 +1978,13 @@ set (f{<RistableMap_Map}) as rr.
 apply AppTheorem.
 Qed.
 
-(*
-Theorem RistMapEq2 : forall {A B SA SB} (f : #(Map A B)) (cond : In f (RistableMap A B SA SB)) (sa : #SA) (a : #A),
+Theorem RistMapEq : forall {A B SA SB} (f : #(Map A B)) (cond : In f (RistableMap A B SA SB)) (sa : #SA) (a : #A),
 sa == a -> %(%RistMap {f ! cond}) sa == %f a.
 Proof.
-intros A B SA SB f cond sa a Eqa.
-rewrite (MapStrong (StrongRistMap2 _ _ _ _ f cond) Eqa).
-hyperreflexivity.
+  intros A B SA SB f cond sa a Eqa.
+  apply (MapStrong (StrongRistMapEq _ _ _ _ {f ! cond} f (ReflexivityEq f))).
+  apply Eqa.
 Qed.
-
-Theorem RistMapEq2Subp : forall {A B SA SB} (f : #(Map A B)) (cond : In f (RistableMap A B SA SB)) (a : #SA) (sub : Subset SA A),
-%(%RistMap {f ! cond}) a == %f (a{<sub}).
-Proof.
-intros A B SA SB f cond a sub.
-apply MapStrongEq.
-apply StrongRistMap2.
-Qed.
-*)
 
 (*Expand Relation*)
 Definition ExpandRelationL {A B X} (sub : Subset A X) : #(Map (Relation A B) (Relation X B)).

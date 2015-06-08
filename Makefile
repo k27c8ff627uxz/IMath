@@ -1,3 +1,4 @@
+all : AddMultPower.vo Order.vo Topology.vo
 
 Topology.vo : logic.vo IZF.vo Relation.vo BaseMap.vo
 	coqc Topology.v

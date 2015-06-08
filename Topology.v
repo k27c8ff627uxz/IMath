@@ -1,4 +1,4 @@
-Require Import logic IZF Relation BaseMap Maps BOperation1.
+Require Import logic IZF Relation BaseMap.
 
 Definition OpenSets A :=
   SSet

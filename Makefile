@@ -1,4 +1,10 @@
 
+Topology.vo : logic.vo IZF.vo Relation.vo BaseMap.vo
+	coqc Topology.v
+
+Order.vo : logic.vo IZF.vo Relation.vo BaseMap.vo Maps.vo
+	coqc Order.v
+
 AddMultPower.vo : logic.vo IZF.vo Relation.vo BaseMap.vo Maps.vo TransitiveRecursion.v BOperation1.vo BOperation2.vo AddMultPower.v
 	coqc AddMultPower.v
 

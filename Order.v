@@ -556,4 +556,112 @@ Qed.
 Definition UpClosure {A} := %Currying (MakeMap _ _ _ (@UpClosure_RFun A)).
 Definition DownClosure {A} := %CombineMap [@UpClosure A ; InverseORel].
 
+Theorem UpClosureTheorem {A} :
+  forall (rel : #(ORelation A)) S (a : #A),
+    In a (%(%UpClosure rel) S) <-> exists s : #A, In s S /\ &&(rel{<ORel_Rel}) s a.
+Proof.
+  intros rel S a.
+  split.
+  {
+    intro InaU.
+    unfold UpClosure in InaU.
+    rewrite CurryingTheorem in InaU.
+    rewrite MakeMapTheorem in InaU.
+    unfold SSet'P in InaU.
+    rewrite DSETEq in InaU.
+    apply SSet'Theorem in InaU.
+    destruct InaU as [InaA cond].
+    destruct (cond InaA) as [s [InsS RelH]].
+    exists s.
+    split.
+    {
+      generalize InsS.
+      apply ArrowRewrite.
+      apply RightPairTheorem.
+    } {
+      generalize RelH.
+      apply RelRewriteAll.
+      reflexivity.
+      reflexivity.
+      rewrite USETEq.
+      rewrite LeftPairTheorem.
+      reflexivity.
+    }
+  }
+  {
+    intro HH.
+    destruct HH as [s [InsS relH]].
+    unfold UpClosure.
+    rewrite CurryingTheorem.
+    rewrite MakeMapTheorem.
+    unfold SSet'P.
+    rewrite DSETEq.
+    apply SSet'Theorem.
+    split.
+    exact (SetProp a).
+    intro InaA.
+    exists s.
+    split.
+    {
+      generalize InsS.
+      apply ArrowRewrite.
+      rewrite RightPairTheorem.
+      reflexivity.
+    } {
+      generalize relH.
+      apply RelRewriteAll.
+      reflexivity.
+      reflexivity.
+      rewrite USETEq.
+      rewrite USETEq.
+      rewrite LeftPairTheorem.
+      reflexivity.
+    }
+  }
+Qed.
+
+
+Theorem DownClosureTheorem {A} :
+  forall (rel : #(ORelation A)) S (a : #A),
+    In a (%(%DownClosure rel) S) <-> exists s : #A, In s S /\ &&(rel{<ORel_Rel}) a s.
+Proof.
+  intros rel S a.
+  unfold DownClosure.
+  split.
+  {
+    intro InH.
+    assert(InH' : In a (%(%UpClosure (%InverseORel rel)) S)).
+    {
+      generalize InH.
+      apply ArrowRewrite.
+      apply MapEq.
+      apply CombineMapTheorem.
+    }
+    apply UpClosureTheorem in InH'.
+    destruct InH' as [s [InsS HH]].
+    exists s.
+    split.
+    assumption.
+    generalize HH.
+    apply InverseORelTheorem.
+  } {
+    intros HH.
+    cut (In a (%(%UpClosure (%InverseORel rel)) S)).
+    {
+      apply ArrowRewrite.
+      apply MapEq.
+      apply SymmetryEq.
+      apply CombineMapTheorem.
+    }
+    apply UpClosureTheorem.
+    destruct HH as [s [Ins HH]].
+    exists s.
+    split.
+    assumption.
+    generalize HH.
+    apply InverseORelTheorem.
+  }
+Qed.
+
+
 

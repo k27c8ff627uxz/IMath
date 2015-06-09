@@ -141,205 +141,185 @@ Qed.
 
 (* Sup Inf *)
 
-Definition Upper_Rel {A} (rel : #(ORelation A)) :=
-  MakeRelation
-    (fun (S1 : #(PowerSet A)) (S2 : #(PowerSet A)) =>
-       forall (b : #A), (forall (a : #A), In a S1 -> &&(rel{<ORel_Rel}) a b) <-> In b S2
-    ).
 
-Theorem Upper_Rel_Theorem :
-  forall {A} (rel : #(ORelation A)),
-  forall S1 S2,
-    &&(Upper_Rel rel) S1 S2 <->
-    (forall (b : #A), (forall (a : #A), In a S1 -> &&(rel{<ORel_Rel}) a b) <-> In b S2).
+Theorem Upper_RFun {A} :
+  RFun (fun (arg : #(Cartesian (ORelation A) (PowerSet A))) => SSet'P A (fun (a : #A) => forall (s : #A), In s (%MRight arg) -> &&((%MLeft arg){<ORel_Rel}) s a)).
 Proof.
-  intros A rel S1 S2.
-  split.
+  intros c1 c2 Eqrel.
+  apply EqualInSSet'Set.
+  hyperreflexivity.
+  intros a1 a2 EqH.
+  split; intros HH.
   {
-    intros relH b.
-    put ((proj1 (MakeRelationTheorem _ _ _ _ _)) relH) HH.
-    clear relH.
-    put (HH _ _ (ReflexivityEq S1) (ReflexivityEq S2)) HHH.
-    clear HH.
-    apply HHH.
-  } {
-    intro cond.
-    apply MakeRelationTheorem.
-    intros S1' S2' EqS1 EqS2 b.
-    split.
+    intros s InsS.
+    cut (&&(%MLeft c1){<ORel_Rel} s a1).
     {
-      intro condH.
-      rewrite <- EqS2.
-      apply cond.
-      intros a InaS1.
-      apply condH.
-      rewrite <- EqS1.
-      apply InaS1.
-    } {
-      intros InbS2 a InaS1.
-      rewrite <- EqS2 in InbS2.
-      put ((proj2 (cond _)) InbS2) HH.
-      apply HH.
-      rewrite EqS1.
-      apply InaS1.
+      apply RelRewriteAll.
+      reflexivity.
+      exact EqH.
+      apply MapArgEq.
+      exact Eqrel.
     }
+    apply HH.
+    rewrite (MapArgEq _ Eqrel).
+    exact InsS.
+  } {
+    intros s InsS.
+    cut (&&(%MLeft c2){<ORel_Rel} s a2).
+    {
+      apply RelRewriteAll.
+      reflexivity.
+      exact (SymmetryEq _ _ EqH).
+      apply MapArgEq.
+      exact (SymmetryEq _ _ Eqrel).
+    }
+    apply HH.
+    rewrite (MapArgEq' _ Eqrel).
+    exact InsS.
   }
 Qed.
 
-Theorem Upper_Rel_MapCond :
-  forall {A} (rel : #(ORelation A)),
-    Rel_MapCond (Upper_Rel rel).
-Proof.
-  intros A rel.
-  intros S1.
-  split.
-  {
-    set (SSet' A (fun a => forall (m : #A), In m S1 -> &&(rel{<ORel_Rel}) m a)) as S2_.
-    assert(InS2A : In S2_ (PowerSet A)).
-    {
-      apply PowersetTheorem.      
-      apply SSet'Subset.
-    }
-    set {S2_ ! InS2A} as S2.
-    exists S2.
-    apply Upper_Rel_Theorem.
-    intro b.
-    split.
-    {
-      intros cond.
-      apply SSet'Theorem.
-      split.
-      apply SetProp.
-      intros InbA m InmS1.
-      cut (&&(rel{<ORel_Rel}) m b).
-      {
-        apply RelRewriteR.
-        hyperreflexivity.
-      }
-      apply cond.
-      assumption.
-    } {
-      intros InbS2' a cond.
-      put ((proj1 (SSet'Theorem _ _ _)) InbS2') HH.
-      destruct HH as [InbA condH].
-      cut (&&(rel{<ORel_Rel}) a {b ! InbA}).
-      {
-        apply RelRewriteR.
-        hyperreflexivity.
-      }
-      apply condH.
-      apply cond.
-    }
-  } {
-    intros SA SB [RelH1 RelH2].
-    put ((proj1 (Upper_Rel_Theorem _ _ _)) RelH1) HH1.
-    put ((proj1 (Upper_Rel_Theorem _ _ _)) RelH2) HH2.
-    clear RelH1.
-    clear RelH2.
-    apply EA.
-    intros b'.
-    split.
-    {
-      intro InbSA.
-      assert(InbA : In b' A).
-      {
-        cut (In SA (PowerSet A)).
-        {
-          intro SubH.
-          apply PowersetTheorem in SubH.
-          apply SubH.
-          assumption.
-        }
-        apply SetProp.
-      }
-      set {b' ! InbA} as b.
-      cut (In b SB).
-      auto.
-      apply HH2.
-      apply HH1.
-      apply InbSA.
-    } {
-      intro InbSB.
-      assert(InbA : In b' A).
-      {
-        cut (In SB (PowerSet A)).
-        {
-          intro SubH.
-          apply PowersetTheorem in SubH.
-          apply SubH.
-          assumption.
-        }
-        apply SetProp.
-      }
-      set {b' ! InbA} as b.
-      cut (In b SA).
-      auto.
-      apply HH1.
-      apply HH2.
-      apply InbSB.
-    }
-  }
-Qed.
-
-Definition Upper {A} (rel : #(ORelation A)) :=
-  (Upper_Rel rel){<Rel_Map ! Upper_Rel_MapCond rel}.
+Definition Upper {A} := %Currying (MakeMap _ _ _ (@Upper_RFun A)).
+Definition Lower {A} := %CombineMap [@Upper A ; InverseORel]. 
 
 Theorem UpperTheorem1 :
   forall {A} (rel : #(ORelation A)) (S : #(PowerSet A)) (m : #A),
-    In m (%(Upper rel) S) -> (forall (a : #A), In a S -> &&(rel{<ORel_Rel}) a m).
+    In m (%(%Upper rel) S) -> (forall (a : #A), In a S -> &&(rel{<ORel_Rel}) a m).
 Proof.
   intros A rel S m InmU a InaS.
-  assert(relH : &&(Upper_Rel rel) S (%(Upper rel) S)).
+  unfold Upper in InmU.
+  rewrite CurryingTheorem in InmU.
+  rewrite MakeMapTheorem in InmU.
+  unfold SSet'P in InmU.
+  rewrite DSETEq in InmU.
+  apply SSet'Theorem in InmU.
+  destruct InmU as [InmA cond].
+  cut (&& ((%MLeft [rel ; S]){<ORel_Rel}) a {m ! (SetProp m)}).
   {
-    generalize (AppTheorem (Upper rel) S).
-    apply RelRewrite.
+    apply RelRewriteAll.
     hyperreflexivity.
+    hyperreflexivity.
+    apply (LeftPairTheorem rel S).
   }
-  put ((proj1 (Upper_Rel_Theorem _ _ _)) relH) HH.
-  clear relH.
-  put ((proj2 (HH _)) InmU) HHH.
-  apply HHH.
-  apply InaS.
+  apply cond.
+  rewrite (RightPairTheorem).
+  exact InaS.
 Qed.
 
 Theorem UpperTheorem2 :
   forall {A} (rel : #(ORelation A)) (S : #(PowerSet A)) (m : #A),
-    (forall (a : #A), In a S -> &&(rel{<ORel_Rel}) a m) -> In m (%(Upper rel) S).
+    (forall (a : #A), In a S -> &&(rel{<ORel_Rel}) a m) -> In m (%(%Upper rel) S).
 Proof.
   intros A rel S m cond.
-  assert(relH : &&(Upper_Rel rel) S (%(Upper rel) S)).
+  unfold Upper.
+  rewrite CurryingTheorem.
+  rewrite MakeMapTheorem.
+  unfold SSet'P.
+  apply SSet'Theorem.
+  split.
+  exact (SetProp m).
+  intros InmA a InaS.
+  cut (&&(rel{<ORel_Rel}) a {m ! InmA}).
   {
-    generalize (AppTheorem (Upper rel) S).
     apply RelRewrite.
-    hyperreflexivity.
+    apply SymmetryEq.
+    apply (LeftPairTheorem rel S).
   }
-  put ((proj1 (Upper_Rel_Theorem _ _ _)) relH) HH.
-  clear relH.
-  apply HH.
   apply cond.
+  rewrite RightPairTheorem in InaS.
+  exact InaS.
 Qed.
 
-Definition Lower {A} (rel : #(ORelation A)) := Upper (%InverseORel rel). 
-           
-Definition Max {A} (rel : #(ORelation A)) :=
-  MakeRelation
-    (fun (S : #(PowerSet A)) (a : #A) => In a (Section S (%(Upper rel) S))).
 
-Definition Min {A} (rel : #ORelation A) := Max (%InverseORel rel).
 
-Definition Sup {A} (rel : #ORelation A) :=
-  MakeRelation
-    (fun (S : #(PowerSet A)) (a : #A) => &&(Min rel) (%(Upper rel) S) a).
 
-Definition Inf {A} (rel : #ORelation A) := Sup (%InverseORel rel).
+
+
+(* Max Min *)
+Theorem RFun_Max {A} :
+  RFun (fun (rel : #(ORelation A)) => 
+          MakeRelation (fun (S : #(PowerSet A)) (a : #A) => In a (Section S (%(%Upper rel) S)))
+       ).
+Proof.
+intros rel1 rel2 Eqxy.
+unfold MakeRelation.
+rewrite DSETEq.
+rewrite DSETEq.
+unfold MakeRelationSet.
+apply EqualInSSetSet.
+reflexivity.
+intros p InpC.
+cut (forall a, %(%Upper rel1) a == %(%Upper rel2) a).
+{
+  intros HH.
+  split; intros S a.
+  {
+    rewrite <- (HH a).
+    auto.
+  } {
+    rewrite (HH a).
+    auto.
+  } 
+}
+intro S.
+apply MapEq.
+apply MapArgEq.
+exact Eqxy.
+Qed.
+
+Definition Max {A} := (MakeMap _ _ _ (@RFun_Max A)).
+Definition Min {A} := %CombineMap [@Max A ; InverseORel].
+
+Theorem RFun_Sup {A} : 
+  RFun (fun (rel : #(ORelation A)) => 
+          MakeRelation
+            (fun (S : #(PowerSet A)) (a : #A) => &&(%Min rel) (%(%Upper rel) S) a)
+       ).
+Proof.
+intros rel1 rel2 Eqrel.
+unfold MakeRelation.
+rewrite DSETEq.
+rewrite DSETEq.
+unfold MakeRelationSet.
+apply EqualInSSetSet.
+reflexivity.
+intros p InpC.
+split; intros cond S a Eqp.
+{
+  generalize (cond _ _ Eqp).
+  apply RelRewriteAll.
+  apply MapEq.
+  apply MapArgEq.
+  exact Eqrel.
+  reflexivity.
+  apply MapArgEq.
+  apply Eqrel.
+} {
+  apply SymmetryEq in Eqrel.
+  generalize (cond _ _ Eqp).
+  apply RelRewriteAll.
+  apply MapEq.
+  apply MapArgEq.
+  exact Eqrel.
+  reflexivity.
+  apply MapArgEq.
+  exact Eqrel.
+}
+Qed.
+
+Definition Sup {A} := MakeMap _ _ _ (@RFun_Sup A).
+Definition Inf {A} := %CombineMap [@Sup A ; InverseORel].
 
 Theorem MaxTheorem1 :
   forall {A} (rel : #(ORelation A)),
   forall (S : #(PowerSet A)) (m : #A),
-    &&(Max rel) S m ->
+    &&(%Max rel) S m ->
     forall (a : #A), In a S -> &&(rel{<ORel_Rel}) a m.
 Proof.
   intros A rel S m MaxH a InaS.
+  unfold If in MaxH.
+  unfold Max in MaxH.
+  rewrite MakeMapTheorem in MaxH.
   put ((proj1 (MakeRelationTheorem _ _ _ _ _)) MaxH) MaxH'.
   clear MaxH.
   put (MaxH' _ _ (ReflexivityEq S) (ReflexivityEq m)) MaxH.
@@ -354,9 +334,12 @@ Qed.
 Theorem MaxTheorem2 :
   forall {A} (rel : #(ORelation A)),
   forall (S : #(PowerSet A)) (m : #A),
-    &&(Max rel) S m -> In m S.
+    &&(%Max rel) S m -> In m S.
 Proof.
   intros A rel S m MaxH.
+  unfold If in MaxH.
+  unfold Max in MaxH.
+  rewrite MakeMapTheorem in MaxH.
   put ((proj1 (MakeRelationTheorem _ _ _ _ _)) MaxH) MaxH'.
   clear MaxH.
   put (MaxH' _ _ (ReflexivityEq S) (ReflexivityEq m)) MaxH.
@@ -368,33 +351,44 @@ Qed.
 Theorem MinTheorem1 :
   forall {A} (rel : #(ORelation A)),
   forall (S : #(PowerSet A)) (m : #A),
-    &&(Min rel) S m ->
+    &&(%Min rel) S m ->
     forall (a : #A), In a S -> &&(rel{<ORel_Rel}) m a.
 Proof.
   intros A rel S m MinH a InaS.
   apply <- (InverseORelTheorem rel).
   apply (MaxTheorem1 _ S).
-  apply MinH.
+  {
+    generalize MinH.
+    apply RelRewrite.
+    unfold Min.
+    apply CombineMapTheorem.
+  }
   apply InaS.
 Qed.
 
 Theorem MinTheorem2 :
   forall {A} (rel : #(ORelation A)),
   forall (S : #(PowerSet A)) (m : #A),
-    &&(Min rel) S m -> In m S.
+    &&(%Min rel) S m -> In m S.
 Proof.
   intros A rel S m MinH.
   apply (MaxTheorem2 (%InverseORel rel)).
-  apply MinH.
+  generalize MinH.
+  apply RelRewrite.
+  unfold Min.
+  apply CombineMapTheorem.
 Qed.
 
 Theorem SupTheorem1 :
   forall {A} (rel : #(ORelation A)),
   forall (S : #(PowerSet A)) (m : #A),
-    &&(Sup rel) S m ->
+    &&(%Sup rel) S m ->
     forall (a : #A), In a S -> &&(rel{<ORel_Rel}) a m.
 Proof.
   intros A rel S m SupH a InaS.
+  unfold If in SupH.
+  unfold Sup in SupH.
+  rewrite MakeMapTheorem in SupH.
   put ((proj1 (MakeRelationTheorem _ _ _ _ _)) SupH) SupH'.
   clear SupH.
   put (SupH' _ _ (ReflexivityEq S) (ReflexivityEq m)) SupH.
@@ -407,10 +401,13 @@ Qed.
 Theorem SupTheorem2 :
   forall {A} (rel : #(ORelation A)),
   forall (S : #(PowerSet A)) (m : #A),
-    &&(Sup rel) S m ->
+    &&(%Sup rel) S m ->
     forall (a : #A), (forall (s : #A), In s S -> &&(rel{<ORel_Rel}) s a) -> &&(rel{<ORel_Rel}) m a.
 Proof.
   intros A rel S m SupH a cond.
+  unfold If in SupH.
+  unfold Sup in SupH.
+  rewrite MakeMapTheorem in SupH.
   put ((proj1 (MakeRelationTheorem _ _ _ _ _)) SupH) SupH'.
   clear SupH.
   put (SupH' _ _ (ReflexivityEq S) (ReflexivityEq m)) SupH.
@@ -422,7 +419,7 @@ Qed.
   
 Theorem Rel_RUnqCond_Max :
   forall {A} (rel : #(ORelation A)),
-    Rel_RUnqCond (Max rel).
+    Rel_RUnqCond (%Max rel).
 Proof.
   intros A rel.
   intros S x y relSx relSy.
@@ -449,7 +446,7 @@ Qed.
 Theorem Max_Sup :
   forall {A} (rel : #(ORelation A)),
   forall (S : #(PowerSet A)) (m1 m2 : #A),
-    &&(Max rel) S m1 /\ &&(Sup rel) S m2 -> m1 == m2.
+    &&(%Max rel) S m1 /\ &&(%Sup rel) S m2 -> m1 == m2.
 Proof.
   intros A rel S m1 m2 [MaxH SupH].
   assert(InrelA : In (rel{<ORel_Rel}) (Antisymmetric A)).
@@ -471,11 +468,11 @@ Proof.
 Qed.
 
 Theorem Rel_RUnqCond_Sup :
-  forall {A} (rel : #(ORelation A)), Rel_RUnqCond (Sup rel).
+  forall {A} (rel : #(ORelation A)), Rel_RUnqCond (%Sup rel).
 Proof.
   intros A rel.
   intro S.
-  assert(Lem : forall (x y : #A), &&(Sup rel) S x -> &&(Sup rel) S y -> &&(rel{<ORel_Rel}) x y).
+  assert(Lem : forall (x y : #A), &&(%Sup rel) S x -> &&(%Sup rel) S y -> &&(rel{<ORel_Rel}) x y).
   {
     intros x y Sx Sy.
     apply (SupTheorem2 _ _ _ Sx).
@@ -502,10 +499,61 @@ Proof.
 Qed.
 
 Theorem Rel_RUnqCond_Inf :
-  forall {A} (rel : #(ORelation A)), Rel_RUnqCond (Inf rel).
+  forall {A} (rel : #(ORelation A)), Rel_RUnqCond (%Inf rel).
 Proof.
   intros A rel.
-  apply Rel_RUnqCond_Sup.
+  unfold Inf.
+  unfold Rel_RUnqCond.
+  intros S.
+  intros x y Sx Sy.
+  apply (Rel_RUnqCond_Sup (%InverseORel rel) S).
+  {
+    generalize Sx.
+    apply RelRewrite.
+    apply CombineMapTheorem.
+  } {
+    generalize Sy.
+    apply RelRewrite.
+    apply CombineMapTheorem.
+  }
 Qed.
+
+
+
+(* Up Closure *)
+Theorem UpClosure_RFun {A} :
+  RFun (fun (arg : #(Cartesian (ORelation A) (PowerSet A))) => SSet'P A (fun (a : #A) => exists (s : #A), In s (%MRight arg) /\ &&((%MLeft arg){<ORel_Rel}) s a)).
+Proof.
+intros arg1 arg2 Eqarg.
+unfold SSet'P.
+apply EqualInSSet'Set.
+reflexivity.
+intros a1 a2 Eqa.
+split; intro HH; destruct HH as [s [Ins HH]]; exists s.
+{
+  split.
+  rewrite (MapArgEq' _ Eqarg).
+  exact Ins.
+  generalize HH.
+  apply RelRewriteAll.
+  reflexivity.
+  exact Eqa.
+  apply MapArgEq.
+  exact Eqarg.
+} {
+  split.
+  rewrite (MapArgEq _ Eqarg).
+  exact Ins.
+  generalize HH.
+  apply RelRewriteAll.
+  reflexivity.
+  exact (SymmetryEq _ _ Eqa).
+  apply MapArgEq.
+  exact (SymmetryEq _ _ Eqarg).
+}
+Qed.
+
+Definition UpClosure {A} := %Currying (MakeMap _ _ _ (@UpClosure_RFun A)).
+Definition DownClosure {A} := %CombineMap [@UpClosure A ; InverseORel].
 
 

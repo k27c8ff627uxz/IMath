@@ -853,6 +853,11 @@ Qed.
 
 Notation " x {<<SP sub }" := ({x ! ((proj2 (PowersetTheorem _ x)) sub)}) (at level 2).
 
+Definition SSetP A (P : SET -> Prop) :=
+  (SSet A P){<<SP SSetSubset A P}.
+
+Definition SSet'P A P :=
+  (SSet' A P){<<SP SSet'Subset A P}.
 
 
 Theorem PowersetHasEmpty : forall A , In Empty (PowerSet A).

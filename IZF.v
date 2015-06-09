@@ -853,13 +853,109 @@ Qed.
 
 Notation " x {<<SP sub }" := ({x ! ((proj2 (PowersetTheorem _ x)) sub)}) (at level 2).
 
+(* * *)
 Definition SSetP A (P : SET -> Prop) :=
   (SSet A P){<<SP SSetSubset A P}.
 
 Definition SSet'P A P :=
   (SSet' A P){<<SP SSet'Subset A P}.
 
+Theorem SSetPTheorem :
+  forall (A : SET) (P : SET -> Prop) (c : SET),
+    In c (SSetP A P) <-> In c A /\ P c.
+Proof.
+  intros A P c.
+  apply SSetTheorem.
+Qed.
 
+Theorem SSet'PTheorem :
+  forall A P (c : #A),
+    In c (SSet'P A P) <-> In c A /\ (forall prf : In c A, P {c ! prf}).
+Proof.
+  intros A P c.
+  apply SSet'Theorem.
+Qed.
+
+
+  
+Theorem Singleton_In_PowerSet : forall {A} (a : #A), In (Singleton a) (PowerSet A).
+Proof.
+  intros A a.
+  apply PowersetTheorem.
+  intros a' Eqa.
+  apply SingletonTheorem in Eqa.
+  rewrite Eqa.
+  apply SetProp.
+Qed.
+
+Definition SingletonP {A} (a : #A) := { Singleton a ! Singleton_In_PowerSet a}.
+
+Theorem SingletonPTheorem {A} :
+  forall a (b : #A), In a (SingletonP b) <-> a == b.
+Proof.
+  intros a b.
+  unfold SingletonP.
+  rewrite DSETEq.
+  apply SingletonTheorem.
+Qed.
+                                                    
+
+
+
+Theorem UnionsP_In_PowerSet : forall {A}, forall (B : #(PowerSet (PowerSet A))), In (Unions B) (PowerSet A).
+Proof.
+  intros A B.
+  put (SetProp B) InSP.
+  apply PowersetTheorem in InSP.
+  apply PowersetTheorem.
+  intros s InsUB.
+  apply UnionsTheorem in InsUB.
+  destruct InsUB as [S [InSB InsS]].
+  apply InSP in InSB.
+  apply PowersetTheorem in InSB.
+  apply InSB.
+  exact InsS.
+Qed.
+
+Definition UnionsP {A} (B : #(PowerSet (PowerSet A))) :=
+  {Unions B ! UnionsP_In_PowerSet B}.
+
+Theorem UnionsPTheorem :
+  forall {A} (B : #(PowerSet (PowerSet A))) c,
+    In c (UnionsP B) <-> (exists a : SET, In a B /\ In c a).
+Proof.
+  intros A B c.
+  apply UnionsTheorem.
+Qed.
+
+
+
+
+Theorem UnorderdPairP_In_Powerset {A} :
+  forall (x y : #A),
+    In (UnorderdPair x y) (PowerSet A).
+Proof.
+  intros x y.
+  apply PowersetTheorem.
+  intros z InxU.
+  apply UnorderdPairTheorem in InxU.
+  destruct InxU as [Eqz | Eqz]; rewrite Eqz; apply SetProp.
+Qed.
+
+Definition UnorderdPairP {A} (x y : #A) :=
+  { UnorderdPair x y ! UnorderdPairP_In_Powerset x y}.
+
+Theorem UnorderdPairPTheorem {A} :
+  forall (a b : #A) c, In c (UnorderdPair a b) <-> c == a \/ c == b.
+Proof.
+  intros a b c.
+  apply UnorderdPairTheorem.
+Qed.
+
+
+
+  (* * *)
+  
 Theorem PowersetHasEmpty : forall A , In Empty (PowerSet A).
 Proof.
 intro A.

@@ -1921,6 +1921,13 @@ intros A.
 apply SectionSubsetR.
 Qed.
 
+Theorem ORel_Trans : forall {A}, Subset (ORelation A) (Transitive A).
+Proof.
+  intros A.
+  apply (TransitivitySubset _ ORel_Poset).
+  apply SectionSubsetR.
+Qed.
+
 Theorem ORel_Rel : forall {A} , Subset (ORelation A) (BRelation A).
 Proof.
   intro A.

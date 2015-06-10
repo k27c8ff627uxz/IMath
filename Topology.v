@@ -9,23 +9,51 @@ Definition OpenSets A :=
          (forall X1 X2, In X1 O -> In X2 O -> In (Section X1 X2) O)
        )
     ).
+
+Theorem OUnions_In :
+  forall {A} (X : #(OpenSets A)) (S : #(PowerSet X)),
+    In (Unions S) X.
+Proof.
+  intros A X S.
+  put (SetProp X) InXO.
+  apply SSetTheorem in InXO.
+  apply (proj1 (proj2 (proj2 InXO))).
+  apply PowersetTheorem.
+  apply SetProp.
+Qed.
+
+Definition OSection_In :
+  forall {A} (X : #(OpenSets A)) (O1 O2 : #X),
+    In (Section O1 O2) X.
+Proof.
+  intros A X O1 O2.
+  put (SetProp X) InXO.
+  apply SSetTheorem in InXO.
+  apply (proj2 (proj2 (proj2 InXO))); apply SetProp.
+Qed.
+
   
+
+
+
+
+        
     
-Definition OpenSetBases A :=
+Definition OpenBases A :=
   SSet
     (PowerSet (PowerSet A))
     (fun O =>
        (Unions O) == A /\ forall X1 X2, In X1 O -> In X2 O -> forall x, In x (Section X1 X2) -> exists X3, In X3 O /\ (In x X3 /\ Subset X3 (Section X1 X2))
     ).
 
-Definition OpenSetBases_to_OpenSets_Fun B := FunctionImageRistriction Unions (PowerSet B).
+Definition OpenBases_to_OpenSets_Fun {A} (B : #(OpenBases A)) := FunctionImageRistriction Unions (PowerSet B).
 
-Theorem OpenSetBases_to_OpenSets_Fun_In :
-  forall A B,
-    In B (OpenSetBases A) ->
-    In (OpenSetBases_to_OpenSets_Fun B) (OpenSets A).
+Theorem OpenBases_to_OpenSets_Fun_In :
+  forall A (B : #(OpenBases A)),
+    In (OpenBases_to_OpenSets_Fun B) (OpenSets A).
 Proof.
-  intros A B InBBase.
+  intros A B.
+  put (SetProp B) InBBase.
   apply SSetTheorem in InBBase.
   destruct InBBase as [InBP [BaseCond1 BaseCond2]].
   apply SSetTheorem.
@@ -239,5 +267,64 @@ Proof.
   }
 Qed.
 
+Definition OpenBases_to_OpenSets {A} (B : #(OpenBases A)) := { _ ! OpenBases_to_OpenSets_Fun_In _ B}.
+
+Theorem OpenBases_to_OpenSetsTheorem1 :
+  forall {A} (B : #(OpenBases A)),
+    Subset B (OpenBases_to_OpenSets B).
+Proof.
+  intros A B.
+  intros O InOB.
+  apply FunctionImageRistrictionTheorem.
+  exists (Singleton O).
+  split.
+  {
+    apply PowersetTheorem.
+    intros O' EqO.
+    apply SingletonTheorem in EqO.
+    rewrite EqO.
+    exact InOB.
+  }
+  apply EA.
+  intro x.
+  split.
+  {
+    intro InxU.
+    apply UnionsTheorem in InxU.
+    destruct InxU as [O' [EqO InxO']].
+    apply SingletonTheorem in EqO.
+    rewrite <- EqO.
+    exact InxO'.
+  } {
+    intro InxO.
+    apply UnionsTheorem.
+    exists O.
+    split.
+    {
+      apply SingletonTheorem.
+      reflexivity.
+    }
+    exact InxO.
+  }
+Qed.
 
 
+Theorem OpenBases_to_OpenSetsTheorem2 :
+  forall {A} (B : #(OpenBases A)) (X : #(OpenSets A)),
+    Subset B X -> Subset (OpenBases_to_OpenSets B) X.
+Proof.
+  intros A B X SubH.
+  intros O InOB'.
+  unfold OpenBases_to_OpenSets in InOB'.
+  rewrite DSETEq in InOB'.
+  apply FunctionImageRistrictionTheorem in InOB'.
+  destruct InOB' as [B' [InB'B EqB]].
+  rewrite <- EqB.
+  put (SetProp X) InXO.
+  apply SSetTheorem in InXO.
+  apply (proj1 (proj2 (proj2 InXO))).
+  generalize SubH.
+  apply TransitivitySubset.
+  apply PowersetTheorem in InB'B.
+  exact InB'B.
+Qed.
